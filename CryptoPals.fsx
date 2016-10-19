@@ -20,6 +20,7 @@ module ByteArray =
 module Text =
   let calcObservedCoincidences (text:string) =
     text
+    |> Seq.filter Char.IsLetter
     |> Seq.countBy id
     |> Seq.map (fun (_, count) -> float (count * (count - 1)))
     |> Seq.sum
@@ -35,8 +36,13 @@ module Text =
 
   let isEnglish text =
     let ic = indexOfCoincidence text
-    (ic >= 1.5 && ic <= 2.0), ic
+    ic >= 1.5 && ic <= 2.0
 
+module Util =
+  let fixedXOR b1 b2 =
+    Seq.zip b1 b2
+    |> Seq.map (fun (a, b) -> a ^^^ b)
+    |> Seq.toArray
 
 // let input = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736" |> Hex.stringToByteArray
 // let result =
@@ -46,3 +52,16 @@ module Text =
 //   // |> List.map (fun (a, b) -> 1)
 
 // printf "%A" input
+
+// let a = "1c0111001f010100061a024b53535009181c"
+// let b = "686974207468652062756c6c277320657965"
+// Util.fixedXOR (Hex.stringToByteArray a) (Hex.stringToByteArray b) |> ByteArray.toHex
+
+let singleByte = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736" |> Hex.stringToByteArray
+// let letters =
+//   ['a' .. 'z'] @ ['A' .. 'Z']
+//   |> List.map (byte >> (Array.create singleByte.Length) >> (Util.fixedXOR singleByte) >> ByteArray.toUTF8)
+//   |> List.filter Text.isEnglish
+//   |> List.head
+
+let r = "Cooking MC's like a pound of bacon" |> Text.indexOfCoincidence
